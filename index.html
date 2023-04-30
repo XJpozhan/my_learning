@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>3D虚拟穿衣系统</title>
+	<title>Image Upload and Processing Example</title>
 	<script type="text/javascript">
 		window.onload = function() {
 			var input = document.getElementById("image-upload");
@@ -23,31 +23,24 @@
 			});
 
 			var flipButton = document.getElementById("flip-button");
-flipButton.addEventListener("click", function() {
-  // 保存当前的变换矩阵，以便恢复到之前状态
-  ctx.save();
-  
-  // 将画布旋转90度
-  ctx.rotate(Math.PI / 2);
-  
-  // 将图像画在画布上
-  ctx.drawImage(image, 0, 0, image.width, image.height);
-  
-  // 恢复之前的变换矩阵，以便下一次绘制
-  ctx.restore();
-});
-		}
+			flipButton.addEventListener("click", function() {
+				ctx.translate(canvas.width, 0);
+				ctx.scale(-1, 1);
+				ctx.drawImage(image, 0, 0, image.width, image.height);
+				ctx.setTransform(1, 0, 0, 1, 0, 0);
+			});
+		};
 	</script>
 </head>
 <body>
 	<form>
-		<h2>选择一张图片</h2>
+		<h2>Upload Image</h2>
 		<input type="file" id="image-upload" accept="image/*">
 	</form>
 	
-	<button id="flip-button">上传后点击按钮</button>
+	<button id="flip-button">Flip Image</button>
 
-	<h2>虚拟穿衣后</h2>
+	<h2>Processed Image</h2>
 	<canvas id="canvas"></canvas>
 </body>
 </html>
