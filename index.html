@@ -1,46 +1,67 @@
 <!DOCTYPE html>
 <html>
-<head>
-	<title>Image Upload and Processing Example</title>
-	<script type="text/javascript">
-		window.onload = function() {
-			var input = document.getElementById("image-upload");
-			var canvas = document.getElementById("canvas");
-			var ctx = canvas.getContext("2d");
-			input.addEventListener("change", function() {
-				var image = new Image();
-				var file = input.files[0];
-				var reader = new FileReader();
-				reader.onload = function(e) {
-					image.src = e.target.result;
-					image.onload = function() {
-						canvas.width = image.width;
-						canvas.height = image.height;
-						ctx.drawImage(image, 0, 0, image.width, image.height);
-					};
-				};
-				reader.readAsDataURL(file);
-			});
+  <head>
+    <meta charset="utf-8">
+    <title>图片翻转</title>
+    <style>
+      canvas {
+        border: 1px solid black;
+      }
+    </style>
+  </head>
+  <body>
+    <form action="http://127.0.0.1:5000/" method="POST" enctype="multipart/form-data">
+        <label for="input">选择要上传的图片:</label>
+        <input type="file" id="input" name="input"/>
+        <br>
+        <input type="submit" value="提交">
+    </form>
+    <canvas id="canvas"></canvas>
+    <button onclick="my_process()">下一张</button>
+    <script>
+      const input = document.getElementById('input');
+      const canvas = document.getElementById('canvas');
+      const ctx = canvas.getContext('2d');
 
-			var flipButton = document.getElementById("flip-button");
-			flipButton.addEventListener("click", function() {
-				ctx.translate(canvas.width, 0);
-				ctx.scale(-1, 1);
-				ctx.drawImage(image, 0, 0, image.width, image.height);
-				ctx.setTransform(1, 0, 0, 1, 0, 0);
-			});
-		};
-	</script>
-</head>
-<body>
-	<form>
-		<h2>Upload Image</h2>
-		<input type="file" id="image-upload" accept="image/*">
-	</form>
-	
-	<button id="flip-button">Flip Image</button>
+      let img = null;  // 用于存储用户上传的图片
 
-	<h2>Processed Image</h2>
-	<canvas id="canvas"></canvas>
-</body>
+      // 当用户上传新图片时，更新画布并进行初始化
+      input.addEventListener('change', function() {
+        if (this.files && this.files[0]) {
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            img = new Image();
+            img.onload = function() {
+              canvas.width = img.width;
+              canvas.height = img.height;
+              ctx.drawImage(img, 0, 0);
+            };
+            img.src = e.target.result;
+          };
+          reader.readAsDataURL(this.files[0]);
+        }
+      });
+      
+      function my_process() {
+        const formData = new FormData(document.querySelector('form'));
+        fetch('/process_form', {
+          method: 'POST',
+          body: formData
+        })
+        .then(response => {
+          if (response.ok) {
+            return response.json()
+          } else {
+            throw new Error('Something went wrong');
+          }
+        })
+        .then(responseJson => {
+          // use responseJson to update the DOM and display the processed data
+        })
+        .catch(error => {
+          console.log(error);
+        });
+      }
+    </script>
+  </body>
 </html>
